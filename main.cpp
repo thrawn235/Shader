@@ -147,7 +147,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glUseProgram(ProgramID);
-		glUniform1ui(FramesLocation, Frames);
+		glUniform1i(FramesLocation, Frames);
 		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);

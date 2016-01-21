@@ -9,7 +9,7 @@ layout(location = 0) out vec4 diffuseColor;
 //in vec2 gl_PointCoord;	//Hat vermutlich nur was bei GL_POINTS zu tun
 
 //7uniform vec3      iResolution;           // viewport resolution (in pixels)
-uniform uint       iFrame;                // shader playback frame
+uniform int       iFrame;                // shader playback frame
 
 void Circle(int PosX, int PosY, int Radius)
 {
@@ -24,20 +24,29 @@ void Circle(int PosX, int PosY, int Radius)
 	}
 }
 
-void Flake()
+void Flake(int width, int Start, int depth)
 {
-	int height = mod(iFrame, 480);
-	Circle(height, 240, 30);
+	int height = -30 + ((iFrame+Start)*depth)%540;
+	Circle(width, height, 10*depth);
 }
 
 void main()
 {
 	diffuseColor = vec4(1,0,1,1);
-	if(gl_FragCoord.x < iFrame)
+	if(gl_FragCoord.x < iFrame%640)
 	{
 		diffuseColor = vec4(1,1,0,1);
 	}
-	Flake();
+	Flake(10,40,1);
+	Flake(15,50,2);
+	Flake(100,10,2);
+	Flake(40,100,3);
+	Flake(103,90,2);
+	Flake(310,76,5);
+	Flake(500,45,3);
+	Flake(630,400,10);
+	Flake(367,145,4);
+	Flake(222,430,3);
 }
 //==============================================
 
