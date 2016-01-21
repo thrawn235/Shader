@@ -119,6 +119,7 @@ int main()
 	
 	cout<<"Load Shaders..."<<endl;
 	GLuint ProgramID = LoadShaders();
+	GLuint FramesLocation = glGetUniformLocation(ProgramID, "iFrame");
 	
 	//prepare Vertex Buffer: ------------------------------------
 	vector<vec3> Vertices;
@@ -139,18 +140,21 @@ int main()
 	
 	
 	cout<<"Start Main Loop..."<<endl;
+	unsigned int Frames = 1;
 	while(true)
 	{
 		glClearColor(0,0.3,0.3,1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glUseProgram(ProgramID);
+		glUniform1ui(FramesLocation, Frames);
 		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, Vertices.size());
 		
 		SDL_GL_SwapWindow(Window);
+		Frames++;
 	}
 	
 	cout<<"Shutting down..."<<endl;
