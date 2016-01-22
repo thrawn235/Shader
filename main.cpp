@@ -137,10 +137,10 @@ int main()
 	
 	//prepare Vertex Buffer: ------------------------------------
 	vector<vec3> Vertices;
-	Vertices.push_back(vec3(-0.9, 0.9,0));
-	Vertices.push_back(vec3( 0.9, 0.9,0));
-	Vertices.push_back(vec3(-0.9,-0.9,0));
-	Vertices.push_back(vec3( 0.9,-0.9,0));
+	Vertices.push_back(vec3(-0.5, 0.5,0));
+	Vertices.push_back(vec3( 0.5, 0.5,0));
+	Vertices.push_back(vec3(-0.5,-0.5,0));
+	Vertices.push_back(vec3( 0.5,-0.5,0));
 	
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);

@@ -1,7 +1,7 @@
 //fragment========================================
 #version 330
 
-layout(location = 0) out vec4 diffuseColor;
+layout(location = 0) out vec4 Color;
 
 //Buit in (inputs):
 //in vec4 gl_FragCoord;		//Aktuelle Position
@@ -11,48 +11,41 @@ layout(location = 0) out vec4 diffuseColor;
 //7uniform vec3      iResolution;           // viewport resolution (in pixels)
 uniform int       iFrame;                // shader playback frame
 
-in vec4 oVertices[4];
+in vec2 oInterpolatedPos;
+flat in vec2 oFlatPos;
 
-void Circle(int PosX, int PosY, int Radius)
+void Circle(vec2 CirclePos, float Radius)
 {
-	vec4 CircPos;
-	CircPos.x = PosX;
-	CircPos.y = PosY;
-	CircPos.z = 0;
-	CircPos.w = 0;
-	if(length(CircPos - gl_FragCoord) < Radius && length(CircPos - gl_FragCoord) > Radius*0.9)
+	if(length(oInterpolatedPos - CirclePos) < Radius && length(oInterpolatedPos - CirclePos) > Radius*0.9)
 	{
-		diffuseColor = vec4(1,0,0,1);
+		Color = vec4(1,1,1,1);
 	}
 }
 
-void Flake(int width, int Start, int depth)
+void Bubble(float PosX, float StartPosY)
 {
-	int height = -(10*depth) + ((iFrame+Start)*depth)%480+2*10*depth;
-	Circle(width, height, 10*depth);
+	float Fract = float(iFrame);
+	Fract = Fract/480;
+	Fract = mod(Fract, 2.0+0.6);
+	Circle(vec2(PosX, -1.3+Fract), 0.3);
 }
 
 void main()
 {
-	diffuseColor = vec4(1,0,1,1);
-	if(gl_FragCoord.x < iFrame%640)
+	Color = vec4(0.4,0.5,0,1); //Background
+	
+	if(oInterpolatedPos.x < -0.5)
 	{
-		diffuseColor = vec4(1,1,0,1);
+		Color = vec4(1,0,0,1);
 	}
-	if(length(gl_FragCoord+oVertices[0]) < 10)
+	if(oInterpolatedPos.x > 0.5)
 	{
-		diffuseColor = vec4(1,1,1,1);
+		Color = vec4(0,1,0,1);
 	}
-	Flake(10,40,1);
-	Flake(15,50,2);
-	Flake(100,10,2);
-	Flake(40,100,3);
-	Flake(103,90,2);
-	Flake(310,76,5);
-	Flake(500,45,3);
-	Flake(630,400,10);
-	Flake(367,145,4);
-	Flake(222,430,3);
+	Circle(vec2(0.5,0.5), 0.2);
+	Circle(vec2(0,0), 0.4);
+	
+	Bubble(-0.3, 1);
 }
 //==============================================
 
