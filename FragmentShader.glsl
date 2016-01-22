@@ -11,6 +11,8 @@ layout(location = 0) out vec4 diffuseColor;
 //7uniform vec3      iResolution;           // viewport resolution (in pixels)
 uniform int       iFrame;                // shader playback frame
 
+in vec4 oVertices[4];
+
 void Circle(int PosX, int PosY, int Radius)
 {
 	vec4 CircPos;
@@ -26,7 +28,7 @@ void Circle(int PosX, int PosY, int Radius)
 
 void Flake(int width, int Start, int depth)
 {
-	int height = -30 + ((iFrame+Start)*depth)%540;
+	int height = -(10*depth) + ((iFrame+Start)*depth)%480+2*10*depth;
 	Circle(width, height, 10*depth);
 }
 
@@ -36,6 +38,10 @@ void main()
 	if(gl_FragCoord.x < iFrame%640)
 	{
 		diffuseColor = vec4(1,1,0,1);
+	}
+	if(length(gl_FragCoord+oVertices[0]) < 10)
+	{
+		diffuseColor = vec4(1,1,1,1);
 	}
 	Flake(10,40,1);
 	Flake(15,50,2);

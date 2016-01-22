@@ -55,6 +55,7 @@ GLuint LoadShaders()
 	cout<<"Create Shader Variables"<<endl;
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	GLuint GeometryShaderID = glCreateShader(GL_GEOMETRY_SHADER);
 	GLuint ProgramID = glCreateProgram();
 
 	cout<<"Read Vertex Source from File..."<<endl;
@@ -77,16 +78,29 @@ GLuint LoadShaders()
 	cout<<"Fragment Shader Compile Log:"<<endl;
 	PrintShaderErrors(FragmentShaderID);
 	
+	cout<<"Read Geometry Source From File..."<<endl;
+	string GeometrySourceBuffer = ReadFile("GeometryShader.glsl");
+	char const* GeometrySource = GeometrySourceBuffer.c_str();
+	cout<<"Load GeometryShader Source in GL..."<<endl;
+	glShaderSource(GeometryShaderID, 1, &GeometrySource, NULL);
+	cout<<"Compile Geometry Shader..."<<endl;
+	glCompileShader(GeometryShaderID);
+	cout<<"Geometry Shader Compile Log:"<<endl;
+	PrintShaderErrors(GeometryShaderID);
+	
 	cout<<"Link Shader Program..."<<endl;
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
+	glAttachShader(ProgramID, GeometryShaderID);
 	glLinkProgram(ProgramID);
 	
 	cout<<"Cleanup. Clear unneeded Variables..."<<endl;
 	glDetachShader(ProgramID, VertexShaderID);
 	glDetachShader(ProgramID, FragmentShaderID);
+	glDetachShader(ProgramID, GeometryShaderID);
 	glDeleteShader(VertexShaderID);
 	glDeleteShader(FragmentShaderID);
+	glDeleteShader(GeometryShaderID);
 	
 	cout<<"Loading Shaders Complete!"<<endl;
 	return ProgramID;
@@ -94,7 +108,7 @@ GLuint LoadShaders()
 
 int main()
 {
-	cout<<"Start Exection"<<endl;
+	cout<<"Start Execution"<<endl;
 	
 	//SDL Init: -----------------------------
 	cout<<"SDL Init..."<<endl;
@@ -123,10 +137,10 @@ int main()
 	
 	//prepare Vertex Buffer: ------------------------------------
 	vector<vec3> Vertices;
-	Vertices.push_back(vec3(-1, 1,0));
-	Vertices.push_back(vec3( 1, 1,0));
-	Vertices.push_back(vec3(-1,-1,0));
-	Vertices.push_back(vec3( 1,-1,0));
+	Vertices.push_back(vec3(-0.9, 0.9,0));
+	Vertices.push_back(vec3( 0.9, 0.9,0));
+	Vertices.push_back(vec3(-0.9,-0.9,0));
+	Vertices.push_back(vec3( 0.9,-0.9,0));
 	
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -151,7 +165,7 @@ int main()
 		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, Vertices.size());
+		glDrawArrays(GL_POINTS, 0, Vertices.size());
 		
 		SDL_GL_SwapWindow(Window);
 		Frames++;
