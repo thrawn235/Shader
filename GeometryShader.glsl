@@ -10,7 +10,7 @@ void main()
     gl_Position = gl_in[0].gl_Position + vec4(-0.4,  0.4, 0.0, 0.0);
     oVertices[0] = gl_Position;
     EmitVertex();
-	gl_Position = gl_in[1].gl_Position + vec4( 0.4,  0.4, 0.0, 0.0);
+	gl_Position = gl_in[0].gl_Position + vec4( 0.4,  0.4, 0.0, 0.0);
 	oVertices[1] = gl_Position;
     EmitVertex();
     gl_Position = gl_in[0].gl_Position + vec4(-0.4, -0.4, 0.0, 0.0);
