@@ -14,42 +14,39 @@ uniform int       iFrame;                // shader playback frame
 in vec3 oInterpolatedPos;
 //flat in vec2 oFlatPos;
 
-/*void Circle(vec2 CirclePos, float Radius)
+void Circle(vec3 CirclePos, float Radius)
 {
 	if(length(oInterpolatedPos - CirclePos) < Radius && length(oInterpolatedPos - CirclePos) > Radius*0.9)
 	{
-		Color = vec4(1,1,1,1);
+		Color = vec4(1,0,0,1);
 	}
 }
 
-void Bubble(float PosX, float StartPosY)
+void Bubble(vec3 CirclePos, float Radius)
 {
-	float Fract = float(iFrame);
-	Fract = Fract/480;
-	Fract = mod(Fract, 2.0+0.6);
-	Circle(vec2(PosX, -1.3+Fract), 0.3);
-}*/
+	CirclePos = CirclePos;
+	float i = float(iFrame)/1000;
+	i = mod(i, 0.9);
+	Circle(CirclePos+vec3(i,-i,0), Radius);
+}
 
 void main()
 {
 	Color = vec4(0.4,0.5,0,1); //Background
-	if(oInterpolatedPos.x < 0.8 && oInterpolatedPos.y < 0.8 && oInterpolatedPos.z < 0.8)
+	if(oInterpolatedPos.x + oInterpolatedPos.y > 0.95)
 	{
 		Color = vec4(1,1,1,1);
 	}
-	
-	//if(oInterpolatedPos.x < -0.5)
-	//{
-	//	Color = vec4(1,0,0,1);
-	//}
-	//if(oInterpolatedPos.x > 0.5)
-	//{
-	//	Color = vec4(0,1,0,1);
-	//}
-	//Circle(vec2(0.5,0.5), 0.2);
-	//Circle(vec2(0,0), 0.4);
-	
-	//Bubble(-0.3, 1);
+	if(oInterpolatedPos.y + oInterpolatedPos.z > 0.95)
+	{
+		Color = vec4(1,1,1,1);
+	}
+	if(oInterpolatedPos.z + oInterpolatedPos.x > 0.95)
+	{
+		Color = vec4(1,1,1,1);
+	}
+	Circle(vec3(0.5,0.5,0.5),0.5);
+	Bubble(vec3(0,0.5,0.5),0.2);
 }
 //==============================================
 

@@ -183,11 +183,7 @@ int main()
 	glDepthFunc(GL_LESS);
 	
 	//prepare Vertex Buffer: ------------------------------------
-	vector<vec3> Vertices;
-	
-	Vertices.push_back(vec3(-0.5, -0.5, 0));
-	Vertices.push_back(vec3( 0, 0.5, 0));
-	Vertices.push_back(vec3( 0.5, -0.5, 0));
+	vector<vec3> Vertices = ReadObj("Tree.obj");
 	
 	
 	GLuint VertexArrayID;
@@ -212,10 +208,10 @@ int main()
 		//Create Perspective Matrix
 		mat4 PerspectiveMatrix = perspective(45.0f, float(640/480), 0.1f, 100.0f);
 		//Create Viewport Matrix
-		mat4 ViewMatrix = lookAt(vec3(0,0,-10), vec3(0,0,0), vec3(0,1,0));
+		mat4 ViewMatrix = lookAt(vec3(0,0,-5), vec3(0,0,0), vec3(0,1,0));
 		//Create Rotation Matrix
 		vec3 Direction(0,0,1);
-		Direction = rotate(Direction, (float)Frames/50, vec3(0,1,0));
+		Direction = rotate(Direction, (float)Frames/500, vec3(0,1,0));
 		mat4 RotationMatrix = glm::orientation(Direction, vec3(0,1,0));
 		
 		glUseProgram(ProgramID);
