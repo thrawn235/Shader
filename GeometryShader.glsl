@@ -1,30 +1,23 @@
 //============= Geometry Shader ==============
 #version 330
-layout(points) in;
+layout(triangles) in;
 layout(triangle_strip, max_vertices = 4) out;
 
-out vec2 oInterpolatedPos;
-flat out vec2 oFlatPos;
+out vec3 oInterpolatedPos;
 
 void main()
 {
-    gl_Position = gl_in[0].gl_Position + vec4(-0.4,  0.4, 0.0, 0.0);
-    oInterpolatedPos = vec2(-1, 1);
-    oFlatPos = vec2(-1, 1);
+    gl_Position = gl_in[0].gl_Position;
+    oInterpolatedPos = vec3(1,0,0);
     EmitVertex();
-	gl_Position = gl_in[0].gl_Position + vec4( 0.4,  0.4, 0.0, 0.0);
-	oInterpolatedPos = vec2( 1, 1);
-    oFlatPos = vec2( 1, 1);
+    
+	gl_Position = gl_in[1].gl_Position;
+	oInterpolatedPos = vec3(0,1,0);
     EmitVertex();
-    gl_Position = gl_in[0].gl_Position + vec4(-0.4, -0.4, 0.0, 0.0);
-    oInterpolatedPos = vec2(-1, -1);
-    oFlatPos = vec2(-1, -1);
+    
+    gl_Position = gl_in[2].gl_Position;
+    oInterpolatedPos = vec3(0,0,1);
     EmitVertex();
-    gl_Position = gl_in[0].gl_Position + vec4( 0.4, -0.4, 0.0, 0.0);
-    oInterpolatedPos = vec2(1, -1);
-    oFlatPos = vec2( 1, -1);
-    EmitVertex();
-
 
     EndPrimitive();
 }

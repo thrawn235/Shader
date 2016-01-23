@@ -15,6 +15,7 @@ using namespace std;
 //glm includes:
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 using namespace glm;
 
 string ReadFile(char* Filepath)
@@ -32,6 +33,45 @@ string ReadFile(char* Filepath)
 	File.close();
 	//cout<<"Read: "<<Output<<endl;
 	return Output;
+}
+
+vector<vec3> ReadObj(string Filepath)
+{
+	FILE* File = fopen(Filepath.c_str(), "r"); 
+	
+	vector<vec3>FileVertices;
+	vector<vec3>Vertices;
+	
+	while(true)
+	{
+		char LinePrefix[256];	//char* geht nicht -.-
+		int Result = fscanf(File ,"%s", LinePrefix);
+		//cout<<LinePrefix<<" ";
+		if(Result == EOF)
+		{
+			break;
+		}
+		if(strcmp(LinePrefix, "v") == 0)
+		{
+			//cout<<"Vertex found";
+			vec3 Vertex;
+			fscanf(File, "%f %f %f\n", &Vertex.x, &Vertex.y, &Vertex.z);
+			//cout<<Vertex.x<<" "<<Vertex.y<<" "<<Vertex.z<<endl;
+			FileVertices.push_back(Vertex);
+		}
+		if(strcmp(LinePrefix, "f") == 0)
+		{
+			//cout<<"Face found";
+			int V1,V2,V3;
+			fscanf(File, "%i %i %i\n", &V1, &V2, &V3);
+			//cout<<V1<<" "<<V2<<" "<<V3<<endl;
+			Vertices.push_back(FileVertices[V1-1]);
+			Vertices.push_back(FileVertices[V2-1]);
+			Vertices.push_back(FileVertices[V3-1]);
+		}
+		
+	}
+	return Vertices;
 }
 
 void PrintShaderErrors(GLuint ShaderID)
@@ -134,13 +174,21 @@ int main()
 	cout<<"Load Shaders..."<<endl;
 	GLuint ProgramID = LoadShaders();
 	GLuint FramesLocation = glGetUniformLocation(ProgramID, "iFrame");
+	GLuint PerspectiveMatrixLocation = glGetUniformLocation(ProgramID, "iPerspectiveMatrix");
+	GLuint ViewMatrixLocation = glGetUniformLocation(ProgramID, "iViewMatrix");
+	GLuint RotationMatrixLocation = glGetUniformLocation(ProgramID, "iRotationMatrix");
+	
+	glEnable(GL_DEPTH_TEST);
+	// Accept fragment if it closer to the camera than the former one
+	glDepthFunc(GL_LESS);
 	
 	//prepare Vertex Buffer: ------------------------------------
 	vector<vec3> Vertices;
-	Vertices.push_back(vec3(-0.5, 0.5,0));
-	Vertices.push_back(vec3( 0.5, 0.5,0));
-	Vertices.push_back(vec3(-0.5,-0.5,0));
-	Vertices.push_back(vec3( 0.5,-0.5,0));
+	
+	Vertices.push_back(vec3(-0.5, -0.5, 0));
+	Vertices.push_back(vec3( 0, 0.5, 0));
+	Vertices.push_back(vec3( 0.5, -0.5, 0));
+	
 	
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -153,6 +201,7 @@ int main()
 	//--------------------------------------------------------
 	
 	
+	
 	cout<<"Start Main Loop..."<<endl;
 	unsigned int Frames = 1;
 	while(true)
@@ -160,12 +209,24 @@ int main()
 		glClearColor(0,0.3,0.3,1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+		//Create Perspective Matrix
+		mat4 PerspectiveMatrix = perspective(45.0f, float(640/480), 0.1f, 100.0f);
+		//Create Viewport Matrix
+		mat4 ViewMatrix = lookAt(vec3(0,0,-10), vec3(0,0,0), vec3(0,1,0));
+		//Create Rotation Matrix
+		vec3 Direction(0,0,1);
+		Direction = rotate(Direction, (float)Frames/50, vec3(0,1,0));
+		mat4 RotationMatrix = glm::orientation(Direction, vec3(0,1,0));
+		
 		glUseProgram(ProgramID);
 		glUniform1i(FramesLocation, Frames);
+		glUniformMatrix4fv(PerspectiveMatrixLocation, 1, GL_FALSE, &PerspectiveMatrix[0][0]);
+		glUniformMatrix4fv(ViewMatrixLocation, 1, GL_FALSE, &ViewMatrix[0][0]);
+		glUniformMatrix4fv(RotationMatrixLocation, 1, GL_FALSE, &RotationMatrix[0][0]);
 		
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_POINTS, 0, Vertices.size());
+		glDrawArrays(GL_TRIANGLES, 0, Vertices.size());
 		
 		SDL_GL_SwapWindow(Window);
 		Frames++;
