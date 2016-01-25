@@ -18,6 +18,20 @@ using namespace std;
 #include <glm/gtx/rotate_vector.hpp>
 using namespace glm;
 
+class Model
+{
+	public:
+	GLuint VerticesArrayID;
+	GLuint VerticesBuffer;
+	GLuint UVArrayID;
+	GLuint UVBuffer;
+	GLuint NormalsArrayID;
+	GLuint NormalsBuffer;
+	int NumVertices;
+	int NumUVs;
+	int NumNormals;
+};
+
 string ReadFile(char* Filepath)
 {
 	string Output;
@@ -35,12 +49,17 @@ string ReadFile(char* Filepath)
 	return Output;
 }
 
-vector<vec3> ReadObj(string Filepath)
+Model ReadObj(string Filepath)
 {
 	FILE* File = fopen(Filepath.c_str(), "r"); 
 	
 	vector<vec3>FileVertices;
-	vector<vec3>Vertices;
+	vector<vec3>FileNormals;
+	vector<vec2>FileUVs;
+	
+	vector<vec3>outVertices;
+	vector<vec3>outNormals;
+	vector<vec2>outUVs;
 	
 	while(true)
 	{
@@ -53,25 +72,96 @@ vector<vec3> ReadObj(string Filepath)
 		}
 		if(strcmp(LinePrefix, "v") == 0)
 		{
-			//cout<<"Vertex found";
+			//cout<<"Vertex found: "<<" ";
 			vec3 Vertex;
 			fscanf(File, "%f %f %f\n", &Vertex.x, &Vertex.y, &Vertex.z);
 			//cout<<Vertex.x<<" "<<Vertex.y<<" "<<Vertex.z<<endl;
 			FileVertices.push_back(Vertex);
 		}
+		if(strcmp(LinePrefix, "vt") == 0)
+		{
+			//cout<<"UV found"<<" ";
+			vec2 UV;
+			fscanf(File, "%f %f\n", &UV.x, &UV.y);
+			//cout<<UV.x<<" "<<UV.y<<endl;
+			FileUVs.push_back(UV);
+		}
+		if(strcmp(LinePrefix, "vn") == 0)
+		{
+			//cout<<"Normal found"<<" ";
+			vec3 Normal;
+			fscanf(File, "%f %f %f\n", &Normal.x, &Normal.y, &Normal.z);
+			//cout<<Normal.x<<" "<<Normal.y<<" "<<Normal.z<<endl;
+			FileNormals.push_back(Normal);
+		}
 		if(strcmp(LinePrefix, "f") == 0)
 		{
-			//cout<<"Face found";
-			int V1,V2,V3;
-			fscanf(File, "%i %i %i\n", &V1, &V2, &V3);
-			//cout<<V1<<" "<<V2<<" "<<V3<<endl;
-			Vertices.push_back(FileVertices[V1-1]);
-			Vertices.push_back(FileVertices[V2-1]);
-			Vertices.push_back(FileVertices[V3-1]);
+			//cout<<"Face found"<<" ";
+			int V1 = 0, V2 = 0, V3 = 0, UV1 = 0, UV2 = 0, UV3 = 0, N1 = 0, N2 = 0, N3 = 0;
+			fscanf(File, "%i/%i/%i %i/%i/%i %i/%i/%i\n", &V1, &UV1, &N1, &V2, &UV2, &N2, &V3, &UV3, &N3);
+			//cout<<V1<<"/"<<UV1<<"/"<<N1<<" "<<V2<<"/"<<UV2<<"/"<<N2<<" "<<V3<<"/"<<UV3<<"/"<<N3<<endl;
+			if(V1 > 0 && V2 > 0 && V3 > 0)
+			{
+				outVertices.push_back(FileVertices[V1-1]);
+				outVertices.push_back(FileVertices[V2-1]);
+				outVertices.push_back(FileVertices[V3-1]);
+			}
+			if(UV1 > 0 && UV2 > 0 && UV3 > 0)
+			{
+				outUVs.push_back(FileUVs[UV1-1]);
+				outUVs.push_back(FileUVs[UV2-1]);
+				outUVs.push_back(FileUVs[UV3-1]);
+			}
+			if(N1 > 0 && N2 > 0 && N3 > 0)
+			{
+				outNormals.push_back(FileNormals[N1-1]);
+				outNormals.push_back(FileNormals[N2-1]);
+				outNormals.push_back(FileNormals[N3-1]);
+			}
 		}
 		
 	}
-	return Vertices;
+	
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+	
+	GLuint VerticesBuffer;
+	glGenBuffers(1, &VerticesBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, VerticesBuffer);
+	glBufferData(GL_ARRAY_BUFFER, outVertices.size() * sizeof(vec3), &outVertices[0], GL_STATIC_DRAW); 
+	
+	GLuint UVArrayID;
+	glGenVertexArrays(1, &UVArrayID);
+	glBindVertexArray(UVArrayID);
+	
+	GLuint UVBuffer;
+	glGenBuffers(1, &UVBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, UVBuffer);
+	glBufferData(GL_ARRAY_BUFFER, outUVs.size() * sizeof(vec2), &outUVs[0], GL_STATIC_DRAW); 
+	
+	GLuint NormalsArrayID;
+	glGenVertexArrays(1, &NormalsArrayID);
+	glBindVertexArray(NormalsArrayID);
+	
+	GLuint NormalsBuffer;
+	glGenBuffers(1, &NormalsBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, NormalsBuffer);
+	glBufferData(GL_ARRAY_BUFFER, outNormals.size() * sizeof(vec3), &outNormals[0], GL_STATIC_DRAW); 
+	
+	Model outModel;
+	outModel.VerticesArrayID = VertexArrayID;
+	outModel.VerticesBuffer = VerticesBuffer;
+	outModel.UVArrayID = UVArrayID;
+	outModel.UVBuffer = UVBuffer;
+	outModel.NormalsArrayID = NormalsArrayID;
+	outModel.NormalsBuffer = NormalsBuffer;
+	outModel.NumVertices = outNormals.size();
+	outModel.NumUVs = outUVs.size();
+	outModel.NumNormals = outNormals.size();
+	
+	return outModel;
+	
 }
 
 void PrintShaderErrors(GLuint ShaderID)
@@ -183,17 +273,7 @@ int main()
 	glDepthFunc(GL_LESS);
 	
 	//prepare Vertex Buffer: ------------------------------------
-	vector<vec3> Vertices = ReadObj("Tree.obj");
-	
-	
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-	
-	GLuint VerticesBuffer;
-	glGenBuffers(1, &VerticesBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, VerticesBuffer);
-	glBufferData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(vec3), &Vertices[0], GL_STATIC_DRAW); 
+	Model testModel = ReadObj("BrandenburgGate.obj"); 
 	//--------------------------------------------------------
 	
 	
@@ -220,9 +300,15 @@ int main()
 		glUniformMatrix4fv(ViewMatrixLocation, 1, GL_FALSE, &ViewMatrix[0][0]);
 		glUniformMatrix4fv(RotationMatrixLocation, 1, GL_FALSE, &RotationMatrix[0][0]);
 		
+		glBindBuffer(GL_ARRAY_BUFFER, testModel.VerticesBuffer);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_TRIANGLES, 0, Vertices.size());
+		
+		glBindBuffer(GL_ARRAY_BUFFER, testModel.NormalsBuffer);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1,3, GL_FLOAT, GL_FALSE, 0, 0);
+		
+		glDrawArrays(GL_TRIANGLES, 0, testModel.NumVertices);
 		
 		SDL_GL_SwapWindow(Window);
 		Frames++;
