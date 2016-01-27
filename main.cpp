@@ -263,17 +263,19 @@ int main()
 	
 	cout<<"Load Shaders..."<<endl;
 	GLuint ProgramID = LoadShaders();
+	
 	GLuint FramesLocation = glGetUniformLocation(ProgramID, "iFrame");
 	GLuint PerspectiveMatrixLocation = glGetUniformLocation(ProgramID, "iPerspectiveMatrix");
 	GLuint ViewMatrixLocation = glGetUniformLocation(ProgramID, "iViewMatrix");
 	GLuint RotationMatrixLocation = glGetUniformLocation(ProgramID, "iRotationMatrix");
+	GLuint LightLocation = glGetUniformLocation(ProgramID, "iLight");
 	
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 	
 	//prepare Vertex Buffer: ------------------------------------
-	Model testModel = ReadObj("BrandenburgGate.obj"); 
+	Model testModel = ReadObj("sphere.obj"); 
 	//--------------------------------------------------------
 	
 	
@@ -288,7 +290,7 @@ int main()
 		//Create Perspective Matrix
 		mat4 PerspectiveMatrix = perspective(45.0f, float(640/480), 0.1f, 100.0f);
 		//Create Viewport Matrix
-		mat4 ViewMatrix = lookAt(vec3(0,0,-5), vec3(0,0,0), vec3(0,1,0));
+		mat4 ViewMatrix = lookAt(vec3(0,0,-15), vec3(0,0,0), vec3(0,1,0));
 		//Create Rotation Matrix
 		vec3 Direction(0,0,1);
 		Direction = rotate(Direction, (float)Frames/500, vec3(0,1,0));
@@ -299,6 +301,9 @@ int main()
 		glUniformMatrix4fv(PerspectiveMatrixLocation, 1, GL_FALSE, &PerspectiveMatrix[0][0]);
 		glUniformMatrix4fv(ViewMatrixLocation, 1, GL_FALSE, &ViewMatrix[0][0]);
 		glUniformMatrix4fv(RotationMatrixLocation, 1, GL_FALSE, &RotationMatrix[0][0]);
+		
+		vec3 Lightpos(-5, 5, -5);
+		glUniform3fv(LightLocation, 1, &Lightpos[0]);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, testModel.VerticesBuffer);
 		glEnableVertexAttribArray(0);

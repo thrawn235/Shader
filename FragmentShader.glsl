@@ -10,8 +10,11 @@ layout(location = 0) out vec4 Color;
 
 //7uniform vec3      iResolution;           // viewport resolution (in pixels)
 uniform int       iFrame;                // shader playback frame
+uniform vec3 iLight;
+uniform mat4 iRotationMatrix;
 
 in vec3 oInterpolatedPos;
+in vec3 iNormal;
 //flat in vec2 oFlatPos;
 
 void Circle(vec3 CirclePos, float Radius)
@@ -32,21 +35,20 @@ void Bubble(vec3 CirclePos, float Radius)
 
 void main()
 {
-	Color = vec4(0.4,0.5,0,1); //Background
-	if(oInterpolatedPos.x + oInterpolatedPos.y > 0.95)
+	float CosTheta = dot(iRotationMatrix*vec4(iNormal, 1), vec4(iLight,1));
+	Color = vec4(CosTheta,CosTheta,CosTheta,1); //Background
+	if(oInterpolatedPos.x + oInterpolatedPos.y > 0.99)
 	{
 		Color = vec4(1,1,1,1);
 	}
-	if(oInterpolatedPos.y + oInterpolatedPos.z > 0.95)
+	if(oInterpolatedPos.y + oInterpolatedPos.z > 0.99)
 	{
 		Color = vec4(1,1,1,1);
 	}
-	if(oInterpolatedPos.z + oInterpolatedPos.x > 0.95)
+	if(oInterpolatedPos.z + oInterpolatedPos.x > 0.99)
 	{
 		Color = vec4(1,1,1,1);
 	}
-	Circle(vec3(0.5,0.5,0.5),0.5);
-	Bubble(vec3(0,0.5,0.5),0.2);
 }
 //==============================================
 
