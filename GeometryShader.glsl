@@ -1,7 +1,7 @@
 //============= Geometry Shader ==============
 #version 330
 layout(triangles) in;
-layout(line_strip, max_vertices = 24) out;
+layout(triangle_strip, max_vertices = 24) out;
 
 uniform mat4 iPerspectiveMatrix;
 uniform mat4 iViewMatrix;
@@ -10,8 +10,9 @@ uniform vec3 iLight;
 
 
 out vec3 oInterpolatedPos;
-out vec3 iNormal;
+out vec3 oNormal;
 out vec3 oColor;
+out vec3 oLightDirection;
 
 in Vertex
 {
@@ -94,18 +95,25 @@ void main()
     EmitVertex();
     gl_Position = normalize(LightPos)+Vertex1;
     oColor = vec3(1, 1, 0.5);
+    
     EmitVertex();
     EndPrimitive();
 	
 	//Draw Vertices:
     gl_Position = Vertex1;
     oColor = vec3(1,1,1);
+    oNormal = Normal1.xyz;
+    oLightDirection = normalize(LightPos).xyz;
     EmitVertex();
 	gl_Position = Vertex2;
 	oColor = vec3(1,1,1);
+	oNormal = Normal2.xyz;
+	oLightDirection = normalize(LightPos).xyz;
     EmitVertex();
     gl_Position = Vertex3;
     oColor = vec3(1,1,1);
+    oNormal = Normal3.xyz;
+    oLightDirection = normalize(LightPos).xyz;
     EmitVertex();
     EndPrimitive();
     
