@@ -290,7 +290,7 @@ int main()
 		//Create Perspective Matrix
 		mat4 PerspectiveMatrix = perspective(45.0f, float(640/480), 0.1f, 100.0f);
 		//Create Viewport Matrix
-		mat4 ViewMatrix = lookAt(vec3(0,0,-15), vec3(0,0,0), vec3(0,1,0));
+		mat4 ViewMatrix = lookAt(vec3(0,0,-5), vec3(0,0,0), vec3(0,1,0));
 		//Create Rotation Matrix
 		vec3 Direction(0,0,1);
 		Direction = rotate(Direction, (float)Frames/500, vec3(0,1,0));

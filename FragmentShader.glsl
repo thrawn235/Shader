@@ -15,6 +15,7 @@ uniform mat4 iRotationMatrix;
 
 in vec3 oInterpolatedPos;
 in vec3 iNormal;
+in vec3 oColor;
 //flat in vec2 oFlatPos;
 
 void Circle(vec3 CirclePos, float Radius)
@@ -35,20 +36,8 @@ void Bubble(vec3 CirclePos, float Radius)
 
 void main()
 {
-	float CosTheta = dot(iRotationMatrix*vec4(iNormal, 1), vec4(iLight,1));
-	Color = vec4(CosTheta,CosTheta,CosTheta,1); //Background
-	if(oInterpolatedPos.x + oInterpolatedPos.y > 0.99)
-	{
-		Color = vec4(1,1,1,1);
-	}
-	if(oInterpolatedPos.y + oInterpolatedPos.z > 0.99)
-	{
-		Color = vec4(1,1,1,1);
-	}
-	if(oInterpolatedPos.z + oInterpolatedPos.x > 0.99)
-	{
-		Color = vec4(1,1,1,1);
-	}
+	Color = vec4(1,1,1,1);
+	Color = vec4(oColor,1);
 }
 //==============================================
 
