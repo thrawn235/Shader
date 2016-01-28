@@ -9,8 +9,10 @@ layout(location = 0) out vec4 Color;
 //in vec2 gl_PointCoord;	//Hat vermutlich nur was bei GL_POINTS zu tun
 
 uniform int iFrame;                // shader playback frame
-uniform vec3 iLight;
+uniform mat4 iPerspectiveMatrix;
+uniform mat4 iViewMatrix;
 uniform mat4 iRotationMatrix;
+uniform vec3 iLight;
 
 in vec3 oInterpolatedPos;
 in vec3 oNormal;
@@ -37,7 +39,7 @@ void main()
 {
 	Color = vec4(1,1,1,1);
 	
-	float Brightness = dot(oLightDirection, oNormal);
+	float Brightness = clamp(dot(oLightDirection, oNormal),0,1);
 	
 	Color = vec4(oColor*Brightness,1);
 }

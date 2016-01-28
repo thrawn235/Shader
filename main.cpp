@@ -275,7 +275,7 @@ int main()
 	glDepthFunc(GL_LESS);
 	
 	//prepare Vertex Buffer: ------------------------------------
-	Model testModel = ReadObj("sphere.obj"); 
+	Model testModel = ReadObj("suzanne.obj"); 
 	//--------------------------------------------------------
 	
 	
