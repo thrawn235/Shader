@@ -7,9 +7,9 @@ uniform mat4 iPerspectiveMatrix;
 uniform mat4 iViewMatrix;
 uniform mat4 iRotationMatrix;
 uniform vec3 iLight;
+uniform vec3 iCamPos;
 
-
-out vec3 oInterpolatedPos;
+out vec3 oNormalizedPos;
 out vec3 oNormal;
 out vec3 oColor;
 out vec3 oLightDirection;
@@ -34,6 +34,7 @@ void main()
 	//nothing to move right now
 	//----- World Space -------
 	vec4 LightPos = vec4(iLight,1);
+	vec4 CamPos = vec4(iCamPos, 1);
 	
 	//Camera
 	Vertex1 = iViewMatrix*Vertex1;
@@ -43,6 +44,7 @@ void main()
 	Normal2 = iViewMatrix*Normal2;
 	Normal3 = iViewMatrix*Normal3;
 	LightPos = iViewMatrix*LightPos;
+	CamPos = iViewMatrix*CamPos;
 	//Perspective
 	Vertex1 = iPerspectiveMatrix*Vertex1;
 	Vertex2 = iPerspectiveMatrix*Vertex2;
@@ -51,6 +53,7 @@ void main()
 	Normal2 = iPerspectiveMatrix*Normal2;
 	Normal3 = iPerspectiveMatrix*Normal3;
 	LightPos = iPerspectiveMatrix*LightPos;
+	CamPos = iPerspectiveMatrix*CamPos;
 	
 	//sollte ich nicht brauchen!!!
 	Normal1 = normalize(Normal1);
@@ -58,7 +61,7 @@ void main()
 	Normal3 = normalize(Normal3);
 	
 	//Draw Light:
-	gl_Position = LightPos - vec4(-0.1, -0.1, 0, 0);
+	/*gl_Position = LightPos - vec4(-0.1, -0.1, 0, 0);
 	oColor = vec3(1,1,0);
     EmitVertex();
 	gl_Position = LightPos - vec4(-0.1,  0.1, 0, 0);
@@ -73,21 +76,21 @@ void main()
     gl_Position = LightPos - vec4(-0.1, -0.1, 0, 0);
     oColor = vec3(1,1,0);
     EmitVertex();
-    EndPrimitive();
+    EndPrimitive();*/
     
     //Draw Light Vectors:
-    /*gl_Position = Vertex1;
+    gl_Position = Vertex1;
     oColor = vec3(0.1, 0.1, 0);
     EmitVertex();
     gl_Position = Vertex1 + vec4(0.01, 0, 0, 0);
     oColor = vec3(0.1, 0.1, 0);
     EmitVertex();
-    gl_Position = LightPos;
+    gl_Position = CamPos;
     oColor = vec3(0.5, 0.1, 0);
     EmitVertex();
-    EndPrimitive();*/
+    EndPrimitive();
     
-    gl_Position = Vertex1;
+    /*gl_Position = Vertex1;
     oColor = vec3(0.1, 0.1, 0.5);
     EmitVertex();
     gl_Position = Vertex1 + vec4(0.01, 0, 0, 0);
@@ -95,30 +98,32 @@ void main()
     EmitVertex();
     gl_Position = normalize(LightPos)+Vertex1;
     oColor = vec3(1, 1, 0.5);
-    
     EmitVertex();
-    EndPrimitive();
+    EndPrimitive();*/
 	
 	//Draw Vertices:
     gl_Position = Vertex1;
     oColor = vec3(1,1,1);
     oNormal = Normal1.xyz;
     oLightDirection = normalize(LightPos).xyz;
+    oNormalizedPos = vec3 (1,0,0);
     EmitVertex();
 	gl_Position = Vertex2;
 	oColor = vec3(1,1,1);
 	oNormal = Normal2.xyz;
 	oLightDirection = normalize(LightPos).xyz;
+	oNormalizedPos = vec3 (0,1,0);
     EmitVertex();
     gl_Position = Vertex3;
     oColor = vec3(1,1,1);
     oNormal = Normal3.xyz;
     oLightDirection = normalize(LightPos).xyz;
+    oNormalizedPos = vec3 (0,0,1);
     EmitVertex();
     EndPrimitive();
     
     //Draw Normals:
-    gl_Position = Vertex1;
+    /*gl_Position = Vertex1;
     oColor = vec3(0.1,0,0);
     EmitVertex();
     gl_Position = Vertex1 + vec4(0.01, 0, 0, 0);
@@ -149,6 +154,6 @@ void main()
     gl_Position = Normal3+Vertex3;
     oColor = vec3(0.5,0,0);
     EmitVertex();
-    EndPrimitive();
+    EndPrimitive();*/
 }
 //==========================================
